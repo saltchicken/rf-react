@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { startFFTPlot } from './fftPlot';
-import { startWaterfallPlot } from './waterfallPlot';
 import ClickButton from './components/ClickButton';
-import { startFFTWaterfallPlot } from './fft_and_waterfall';
+import { startFFTPlot } from './fftPlot';
 
 function App() {
   const chartRef = useRef();
@@ -10,7 +8,7 @@ function App() {
 
   useEffect(() => {
     if (chartRef.current && chartRef2.current) {
-      startFFTWaterfallPlot(chartRef.current, chartRef2.current, "ws://localhost:8767");
+      startFFTPlot(chartRef.current, chartRef2.current, "ws://localhost:8767");
     }
     // if (chartRef2.current) {
     //   startFFTPlot(chartRef2.current, "ws://localhost:8766");
