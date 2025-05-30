@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     if (chartRef.current) {
-      startWaterfallPlot(chartRef.current, "ws://localhost:8766");
+      startWaterfallPlot(chartRef.current, "ws://localhost:8767");
     }
     if (chartRef2.current) {
       startFFTPlot(chartRef2.current, "ws://localhost:8766");
