@@ -18,13 +18,15 @@ function App() {
 
   return (
     <div>
-    <div style={{ margin: 0, background: '#111', color: '#ccc', height: '75vh', width: '100vw' }}>
+    <div style={{ margin: 0, background: '#111', color: '#ccc', height: '70vh', width: '100vw' }}>
       <div ref={chartRef2} style={{ height: '100%', width: '100%' }} />
     </div>
-    <div style={{ margin: 0, background: '#111', color: '#ccc', height: '25vh', width: '100vw' }}>
+    <div style={{ margin: 0, background: '#111', color: '#ccc', height: '20vh', width: '100vw' }}>
       <div ref={chartRef} style={{ height: '100%', width: '100%' }} />
     </div>
+      <div style={{ margin: 0, background: '#111', color: '#ccc', height: '10vh', width: '100vw' }}>
     <ClickButton />
+    </div>
     </div>
   );
 }
