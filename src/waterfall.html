@@ -14,13 +14,13 @@
 <div id="heatmap"></div>
 
 <script>
-  const N_FREQ_BINS = 50;     // Number of frequency bins (FFT bins)
+  const N_FREQ_BINS = 1024;     // Number of frequency bins (FFT bins)
   const MAX_TIME_SLICES = 40; // Number of time slices visible at once
 
   // Initialize empty 2D data matrix (time slices × freq bins)
   let fftData = [];
   for (let i = 0; i < MAX_TIME_SLICES; i++) {
-    var blank = Array(50).fill(0);
+    var blank = Array(N_FREQ_BINS).fill(0);
     fftData.push(blank);
   }
 
