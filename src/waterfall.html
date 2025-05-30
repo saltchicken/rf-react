@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Real-time FFT Heatmap Example</title>
+<script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+  <style>
+    body { margin: 0; }
+    #heatmap { width: 90vw; height: 60vh; }
+  </style>
+</head>
+<body>
+
+<div id="heatmap"></div>
+
+<script>
+  const N_FREQ_BINS = 50;     // Number of frequency bins (FFT bins)
+  const MAX_TIME_SLICES = 40; // Number of time slices visible at once
+
+  // Initialize empty 2D data matrix (time slices × freq bins)
+  let fftData = [];
+  for (let i = 0; i < MAX_TIME_SLICES; i++) {
+    var blank = Array(50).fill(0);
+    fftData.push(blank);
+  }
+
+  // Initialize x-axis (time slices)
+  let timeLabels = [];
+  for (let i = 0; i < MAX_TIME_SLICES; i++) {
+    timeLabels.push(i+1);
+  }
+
+  // Initialize y-axis (frequency bins)
+  let freqLabels = [];
+  for (let i = 0; i < N_FREQ_BINS; i++) {
+    freqLabels.push(i+1);  // you can map to actual frequencies if you want
+  }
+
+  // Helper: Generate fake FFT magnitudes for one time slice
+  function generateFakeFFT() {
+    const data = [];
+    for (let i = 0; i < N_FREQ_BINS; i++) {
+      // Random magnitude with some smoothness
+      data.push(Math.abs(Math.sin(Date.now() / 1000 + i / 5)) * 10 + Math.random() * 5);
+    }
+    return data;
+  }
+
+  // Initial heatmap data
+  let data = [{
+    z: fftData,
+    y: timeLabels,
+    x: freqLabels,
+    type: 'heatmap',
+    colorscale: 'Viridis',
+    zmin: 0,
+    zmax: 20,
+  }];
+
+  let layout = {
+    title: 'Real-time FFT Heatmap',
+    xaxis: { title: 'Freq bins' },
+    yaxis: { title: 'Time (slices)' },
+  };
+
+  Plotly.newPlot('heatmap', data, layout);
+
+  // Function to update heatmap with new FFT slice
+  function updateHeatmap() {
+    // Generate new FFT slice
+    const newSlice = generateFakeFFT();
+
+    // Append new time slice label (just count index)
+    // const newTimeLabel = (timeLabels.length > 0 ? timeLabels[timeLabels.length - 1] + 1 : 0);
+
+    // Add to fftData and timeLabels
+    fftData.push(newSlice);
+    // timeLabels.push(newTimeLabel);
+    // console.log(timeLabels);
+
+    // Keep the matrix size capped to MAX_TIME_SLICES (rolling window)
+    if (fftData.length > MAX_TIME_SLICES) {
+      fftData.shift();
+      // timeLabels.shift();
+    }
+
+    // Update the heatmap plot
+    Plotly.update('heatmap', {
+      z: [fftData],
+    });
+  }
+
+  // Update every 500 ms
+  setInterval(updateHeatmap, 50);
+</script>
+
+</body>
+</html>
