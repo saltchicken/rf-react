@@ -23,7 +23,7 @@ export function startWaterfallPlot(container, websocketUrl) {
   }
 
   let layout = {
-    title: 'Real-time FFT Heatmap',
+    // title: 'Real-time FFT Heatmap',
     plot_bgcolor: '#1e1e1e',
     paper_bgcolor: '#1e1e1e',
     xaxis: { title: 'Freq bins' },
@@ -38,6 +38,7 @@ export function startWaterfallPlot(container, websocketUrl) {
     colorscale: 'Viridis',
     zmin: 0,
     zmax: 30,
+    showscale: false,
   }];
 
   // Plotly.newPlot('heatmap', data, layout, {responsive: true});
