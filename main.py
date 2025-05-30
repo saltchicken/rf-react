@@ -47,7 +47,7 @@ async def start_readerfft():
     global reader_task
     global reader_task2
     reader_task = asyncio.create_task(readerFFT.run())
-    reader_taks2 = asyncio.create_task(readerFFT2.run())
+    reader_task2 = asyncio.create_task(readerFFT2.run())
     print("ReaderFFT started.")
 
 @app.on_event("shutdown")
