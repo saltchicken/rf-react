@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from rfanalyze import ReaderFFT
+from pydantic import BaseModel
 import os
 
 
@@ -35,11 +36,13 @@ app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
 def serve_index():
     return FileResponse("dist/index.html")
 
+class NumberPayload(BaseModel):
+    number: float
+
 @app.post("/api/button-click")
-async def button_clicked():
-    response = await readerFFT.set_setting("gain", 10.0)
-    print(response)
-    return {"message": "Button clicked!"}
+async def button_click(payload: NumberPayload):
+    response = await readerFFT.set_setting("gain", payload.number)
+    return {"message": f"{response}"}
 
 
 @app.on_event("startup")
