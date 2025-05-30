@@ -1,6 +1,6 @@
 import Plotly from 'https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.26.0/+esm';
 
-export function startWaterfallPlot(container, websocketUrl = "ws://localhost:8765") {
+export function startWaterfallPlot(container, websocketUrl) {
   const N_FREQ_BINS = 1024;     // Number of frequency bins (FFT bins)
   const MAX_TIME_SLICES = 40; // Number of time slices visible at once
 
@@ -24,6 +24,8 @@ export function startWaterfallPlot(container, websocketUrl = "ws://localhost:876
 
   let layout = {
     title: 'Real-time FFT Heatmap',
+    plot_bgcolor: '#1e1e1e',
+    paper_bgcolor: '#1e1e1e',
     xaxis: { title: 'Freq bins' },
     yaxis: { title: 'Time (slices)' },
   };
