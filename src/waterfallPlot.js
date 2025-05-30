@@ -52,7 +52,7 @@ export function startWaterfallPlot(container, websocketUrl) {
       const json = JSON.parse(event.data);
       if (json.type === "init") {
         console.log("init received")
-        // freqs = Array.from(new Float32Array(json.data));
+        freqLabels = Array.from(new Float32Array(json.data));
       }
     } else if (event.data instanceof ArrayBuffer) {
       let mags = Array.from(new Float32Array(event.data));
@@ -62,7 +62,7 @@ export function startWaterfallPlot(container, websocketUrl) {
       if (fftData.length > MAX_TIME_SLICES) {
         fftData.shift();
       }
-      Plotly.update(container, { z: [fftData] } );
+      Plotly.update(container, { x: [freqLabels], z: [fftData] } );
     }
   };
 
