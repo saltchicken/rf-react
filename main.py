@@ -14,6 +14,7 @@ args = argparse.Namespace(
     host="10.0.0.5",
     port=5000,
     sample_rate=2000000.0,
+    center_freq=1000000.0,
     freq_offset=-550000.0,
     chunk_size=4096,
     chunks_per_frame=16,
@@ -64,6 +65,7 @@ class XValue(BaseModel):
 @app.post("/api/selected_x")
 async def receive_x(value: XValue):
     print(f"Received x value: {value.x}")
+    readerFFT.freq_offset = round(value.x - readerFFT.center_freq)
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
 
