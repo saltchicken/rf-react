@@ -91,16 +91,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     return xaxis.p2l(xPixel - xaxis._offset);
   }
 
-  // Mouse down: start dragging
-  containerFFT.addEventListener('mousedown', function (event) {
-    const xData = getXDataFromMouse(event);
-    Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
-    isDragging = true;
-  });
-
-  containerFFT.addEventListener('mousemove', function (event) {
-    if (!isDragging) return;
-
+  function isInsideGraph(event) {
     const xaxis = containerFFT._fullLayout.xaxis;
     const yaxis = containerFFT._fullLayout.yaxis;
     const mouseX = event.clientX;
@@ -119,8 +110,34 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
       mouseY < plotTop ||
       mouseY > plotBottom
     ) {
-      return; // Outside the graph
+      return false;
+    } else {
+      return true;
     }
+  }
+
+  // Mouse down: start dragging
+  containerFFT.addEventListener('mousedown', function (event) {
+    if (!isInsideGraph(event)) return;
+    const xData = getXDataFromMouse(event);
+    Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+    // Send to FastAPI
+    fetch("/api/selected_x", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ x: xData })
+    }).catch(err => console.error("Failed to send xData:", err));
+    isDragging = true;
+  });
+
+  containerFFT.addEventListener('mousemove', function (event) {
+    if (!isDragging) return;
+
+    if (!isInsideGraph(event)) {
+      isDragging = false;
+      return;
+    }
+
 
     const xData = getXDataFromMouse(event);
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
