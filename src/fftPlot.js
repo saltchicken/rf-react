@@ -58,8 +58,62 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     showscale: false,
   }];
 
-  Plotly.newPlot(containerFFT, FFTData, FFTLayout, { responsive: true });
+  Plotly.newPlot(containerFFT, FFTData, FFTLayout, { responsive: true, staticPlot: true });
   Plotly.newPlot(containerWaterfall, WaterfallData, WaterfallLayout, { responsive: true });
+
+
+
+
+let isDragging = false;
+
+// Create vertical line shape at a given x position
+function createVerticalLine(xData) {
+  return {
+    type: 'line',
+    x0: xData,
+    x1: xData,
+    y0: 0,
+    y1: 1,
+    yref: 'paper',
+    line: {
+      color: 'red',
+      width: 2,
+      dash: 'line'
+    }
+  };
+}
+
+// Convert mouse x pixel to data coordinate
+function getXDataFromMouse(event) {
+  const bb = containerFFT.getBoundingClientRect();
+  const xPixel = event.clientX - bb.left;
+  const xaxis = containerFFT._fullLayout.xaxis;
+  return xaxis.p2l(xPixel - xaxis._offset);
+}
+
+// Mouse down: start dragging
+containerFFT.addEventListener('mousedown', function(event) {
+  const xData = getXDataFromMouse(event);
+  Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+  isDragging = true;
+});
+
+// Mouse move: update line if dragging
+window.addEventListener('mousemove', function(event) {
+  if (!isDragging) return;
+  const xData = getXDataFromMouse(event);
+  Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+});
+
+// Mouse up: stop dragging
+window.addEventListener('mouseup', function() {
+  isDragging = false;
+});
+
+
+
+
+
 
   const ws = new WebSocket(websocketUrl);
   ws.binaryType = "arraybuffer";
