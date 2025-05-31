@@ -98,7 +98,6 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     isDragging = true;
   });
 
-  // Mouse move: update line if dragging and within bounds
   containerFFT.addEventListener('mousemove', function (event) {
     if (!isDragging) return;
 
@@ -120,11 +119,18 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
       mouseY < plotTop ||
       mouseY > plotBottom
     ) {
-      return; // Don't update if outside plot area
+      return; // Outside the graph
     }
 
     const xData = getXDataFromMouse(event);
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+
+    // Send to FastAPI
+    fetch("/api/selected_x", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ x: xData })
+    }).catch(err => console.error("Failed to send xData:", err));
   });
 
   // Mouse up: stop dragging

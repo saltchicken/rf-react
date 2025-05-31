@@ -9,7 +9,17 @@ from pydantic import BaseModel
 import os
 
 
-args = argparse.Namespace(command='fft', host='10.0.0.5', port=5000, sample_rate=2000000.0, freq_offset=-550000.0, chunk_size=4096, chunks_per_frame=16, decimation_factor=64, publisher_port=8767)
+args = argparse.Namespace(
+    command="fft",
+    host="10.0.0.5",
+    port=5000,
+    sample_rate=2000000.0,
+    freq_offset=-550000.0,
+    chunk_size=4096,
+    chunks_per_frame=16,
+    decimation_factor=64,
+    publisher_port=8767,
+)
 readerFFT = ReaderFFT(args)
 reader_task: asyncio.Task | None = None
 
@@ -36,13 +46,26 @@ app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
 def serve_index():
     return FileResponse("dist/index.html")
 
+
 class NumberPayload(BaseModel):
     number: float
+
 
 @app.post("/api/button-click")
 async def button_click(payload: NumberPayload):
     response = await readerFFT.set_setting("gain", payload.number)
     return {"message": f"{response}"}
+
+
+class XValue(BaseModel):
+    x: float
+
+
+@app.post("/api/selected_x")
+async def receive_x(value: XValue):
+    print(f"Received x value: {value.x}")
+    # Do something with the x value (e.g. store, trigger something)
+    return {"status": "ok", "x_received": value.x}
 
 
 @app.on_event("startup")
@@ -52,6 +75,7 @@ async def start_readerfft():
     reader_task = asyncio.create_task(readerFFT.run())
     # reader_task2 = asyncio.create_task(readerFFT2.run())
     print("ReaderFFT started.")
+
 
 @app.on_event("shutdown")
 async def shutdown_readerfft():
