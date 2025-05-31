@@ -19,17 +19,13 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     timeLabels.push(i+1);
   }
 
-  let freqLabels = [];
-  for (let i = 0; i < N_FREQ_BINS; i++) {
-    freqLabels.push(i+1);  // you can map to actual frequencies if you want
-  }
 
   const FFTLayout = {
     margin: { l: 50, r: 50, t: 50, b: 0 },
     title: { text: 'Real-Time FFT', font: { color: '#ccc' } },
     plot_bgcolor: '#1e1e1e',
     paper_bgcolor: '#1e1e1e',
-    xaxis: { showticklabels: false, color: '#ccc', gridcolor: '#222' },
+    xaxis: { showticklabels: false, nticks: 10, color: '#ccc', gridcolor: '#222' },
     yaxis: { title: 'Magnitude', range: [0, 100], autorange: false, color: '#ccc', gridcolor: '#222' }
   };
 
@@ -38,7 +34,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     margin: { l: 50, r: 50, t: 0, b: 50 },
     plot_bgcolor: '#1e1e1e',
     paper_bgcolor: '#1e1e1e',
-    xaxis: { title: 'Freq bins' },
+    xaxis: { title: 'Freq bins', nticks: 20 },
     yaxis: { title: 'Time (slices)' },
   };
 
@@ -54,7 +50,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   let WaterfallData = [{
     z: fftData,
     y: timeLabels,
-    x: freqLabels,
+    x: freqs,
     type: 'heatmap',
     colorscale: 'Viridis',
     zmin: 0,
@@ -73,7 +69,6 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
       const json = JSON.parse(event.data);
       if (json.type === "init") {
         freqs = Array.from(new Float32Array(json.data));
-        freqLabels = Array.from(new Float32Array(json.data));
       }
     } else if (event.data instanceof ArrayBuffer) {
       mags = Array.from(new Float32Array(event.data));
@@ -83,7 +78,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
         fftData.shift();
       }
       Plotly.update(containerFFT, { x: [freqs], y: [mags] });
-      Plotly.update(containerWaterfall, { x: [freqLabels], z: [fftData] });
+      Plotly.update(containerWaterfall, { x: [freqs], z: [fftData] });
     }
   };
 
