@@ -92,6 +92,8 @@ class SettingPayload(BaseModel):
 @app.post("/api/set-setting")
 async def button_click(setting: SettingPayload):
     response = await readerFFT.set_setting(setting.setting, setting.value)
+    await readerFFT.update_settings()
+    await readerListener.update_settings()
     return {"message": f"{response}"}
 
 
@@ -104,5 +106,7 @@ async def receive_x(value: XValue):
     print(f"Received x value: {value.x}")
     readerFFT.freq_offset = round(value.x - readerFFT.center_freq)
     readerListener.freq_offset = round(value.x - readerListener.center_freq)
+    # print(readerFFT.freq_offset, readerListener.freq_offset)
+    # print(f"Freq Center: {readerFFT.center_freq}, {readerListener.center_freq}")
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
