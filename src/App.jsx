@@ -16,16 +16,16 @@ function App() {
   }, []);
 
   return (
-    <div>
-    <div style={{ margin: 0, background: '#111', color: '#ccc', height: '70vh', width: '100vw' }}>
-      <div ref={chartRef} style={{ height: '100%', width: '100%' }} />
-    </div>
-    <div style={{ margin: 0, background: '#111', color: '#ccc', height: '20vh', width: '100vw' }}>
-      <div ref={chartRef2} style={{ height: '100%', width: '100%' }} />
-    </div>
-      <div style={{ margin: 0, background: '#111', color: '#ccc', height: '10vh', width: '100vw' }}>
-    <ClickButton />
-    </div>
+    <div style={{ margin: 0, padding: 0, display: 'flex', flexDirection: 'column', height: '90vh', width: '90vw' }}>
+      <div style={{ margin: 0, background: '#111', color: '#ccc', height: '70%', width: '100vw' }}>
+        <div ref={chartRef} style={{ height: '100%', width: '100%' }} />
+      </div>
+      <div style={{ margin: 0, background: '#111', color: '#ccc', height: '20%', width: '100vw' }}>
+        <div ref={chartRef2} style={{ height: '100%', width: '100%' }} />
+      </div>
+      <div style={{ margin: 0, background: '#111', color: '#ccc', height: '10%', width: '100vw' }}>
+        <ClickButton />
+      </div>
     </div>
   );
 }
