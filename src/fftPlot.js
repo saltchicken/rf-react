@@ -16,7 +16,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
 
   let timeLabels = [];
   for (let i = 0; i < MAX_TIME_SLICES; i++) {
-    timeLabels.push(i+1);
+    timeLabels.push(i + 1);
   }
 
 
@@ -64,51 +64,51 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
 
 
 
-let isDragging = false;
+  let isDragging = false;
 
-// Create vertical line shape at a given x position
-function createVerticalLine(xData) {
-  return {
-    type: 'line',
-    x0: xData,
-    x1: xData,
-    y0: 0,
-    y1: 1,
-    yref: 'paper',
-    line: {
-      color: 'red',
-      width: 2,
-      dash: 'line'
-    }
-  };
-}
+  // Create vertical line shape at a given x position
+  function createVerticalLine(xData) {
+    return {
+      type: 'line',
+      x0: xData,
+      x1: xData,
+      y0: 0,
+      y1: 1,
+      yref: 'paper',
+      line: {
+        color: 'red',
+        width: 2,
+        dash: 'line'
+      }
+    };
+  }
 
-// Convert mouse x pixel to data coordinate
-function getXDataFromMouse(event) {
-  const bb = containerFFT.getBoundingClientRect();
-  const xPixel = event.clientX - bb.left;
-  const xaxis = containerFFT._fullLayout.xaxis;
-  return xaxis.p2l(xPixel - xaxis._offset);
-}
+  // Convert mouse x pixel to data coordinate
+  function getXDataFromMouse(event) {
+    const bb = containerFFT.getBoundingClientRect();
+    const xPixel = event.clientX - bb.left;
+    const xaxis = containerFFT._fullLayout.xaxis;
+    return xaxis.p2l(xPixel - xaxis._offset);
+  }
 
-// Mouse down: start dragging
-containerFFT.addEventListener('mousedown', function(event) {
-  const xData = getXDataFromMouse(event);
-  Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
-  isDragging = true;
-});
+  // Mouse down: start dragging
+  containerFFT.addEventListener('mousedown', function (event) {
+    const xData = getXDataFromMouse(event);
+    Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+    isDragging = true;
+  });
 
-// Mouse move: update line if dragging
-window.addEventListener('mousemove', function(event) {
-  if (!isDragging) return;
-  const xData = getXDataFromMouse(event);
-  Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
-});
+  // Mouse move: update line if dragging
+  window.addEventListener('mousemove', function (event) {
+    if (!isDragging) return;
+    const xData = getXDataFromMouse(event);
+    Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+  });
 
-// Mouse up: stop dragging
-window.addEventListener('mouseup', function() {
-  isDragging = false;
-});
+  // Mouse up: stop dragging
+  window.addEventListener('mouseup', function () {
+    isDragging = false;
+  });
 
 
 
