@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from rfanalyze import ReaderFFT
+from rfanalyze import ReaderFFT, ReaderListener
 from pydantic import BaseModel
 import os
 
@@ -24,9 +24,20 @@ args = argparse.Namespace(
 readerFFT = ReaderFFT(args)
 reader_task: asyncio.Task | None = None
 
-# args = argparse.Namespace(command='fft', host='10.0.0.5', port=5000, sample_rate=2000000.0, freq_offset=-550000.0, chunk_size=4096, chunks_per_frame=16, decimation_factor=64, publisher_port=8767)
-# readerFFT2 = ReaderFFT(args)
-# reader_task2: asyncio.Task | None = None
+args = argparse.Namespace(
+    command="fft",
+    host="10.0.0.5",
+    port=5000,
+    sample_rate=2000000.0,
+    center_freq=1000000.0,
+    freq_offset=-550000.0,
+    chunk_size=4096,
+    chunks_per_frame=16,
+    decimation_factor=64,
+    publisher_port=8767,
+)
+readerListener = ReaderListener(args)
+reader_task2: asyncio.Task | None = None
 
 app = FastAPI()
 
@@ -66,6 +77,7 @@ class XValue(BaseModel):
 async def receive_x(value: XValue):
     print(f"Received x value: {value.x}")
     readerFFT.freq_offset = round(value.x - readerFFT.center_freq)
+    readerListener.freq_offset = round(value.x - readerListener.center_freq)
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
 
@@ -73,16 +85,16 @@ async def receive_x(value: XValue):
 @app.on_event("startup")
 async def start_readerfft():
     global reader_task
-    # global reader_task2
+    global reader_task2
     reader_task = asyncio.create_task(readerFFT.run())
-    # reader_task2 = asyncio.create_task(readerFFT2.run())
+    reader_task2 = asyncio.create_task(readerListener.run())
     print("ReaderFFT started.")
 
 
 @app.on_event("shutdown")
 async def shutdown_readerfft():
     global reader_task
-    # global reader_task2
+    global reader_task2
     if reader_task:
         print("Cancelling ReaderFFT...")
         reader_task.cancel()
@@ -90,10 +102,10 @@ async def shutdown_readerfft():
             await reader_task
         except asyncio.CancelledError:
             print("ReaderFFT cancelled cleanly.")
-    # if reader_task2:
-    #     print("Cancelling ReaderFFT...")
-    #     reader_task2.cancel()
-    #     try:
-    #         await reader_task2
-    #     except asyncio.CancelledError:
-    #         print("ReaderFFT cancelled cleanly.")
+    if reader_task2:
+        print("Cancelling ReaderFFT...")
+        reader_task2.cancel()
+        try:
+            await reader_task2
+        except asyncio.CancelledError:
+            print("ReaderFFT cancelled cleanly.")
