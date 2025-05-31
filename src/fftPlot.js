@@ -150,10 +150,6 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   });
 
 
-
-
-
-
   const ws = new WebSocket(websocketUrl);
   ws.binaryType = "arraybuffer";
 
