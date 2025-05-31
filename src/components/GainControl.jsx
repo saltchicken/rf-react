@@ -6,12 +6,12 @@ const GainControl = () => {
 
   const sendNumber = async (value) => {
     try {
-      const res = await fetch("http://localhost:5000/api/button-click", {
+      const res = await fetch("http://localhost:5000/api/set-setting", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ number: parseFloat(value) }),
+        body: JSON.stringify({ setting: "gain", value: parseFloat(value) }),
       });
 
       const data = await res.json();

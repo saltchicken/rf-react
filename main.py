@@ -84,13 +84,14 @@ async def shutdown_readerfft():
     await cancel_task(app.state.reader_task2, "ReaderListener")
 
 
-class NumberPayload(BaseModel):
-    number: float
+class SettingPayload(BaseModel):
+    setting: str
+    value: float
 
 
-@app.post("/api/button-click")
-async def button_click(payload: NumberPayload):
-    response = await readerFFT.set_setting("gain", payload.number)
+@app.post("/api/set-setting")
+async def button_click(setting: SettingPayload):
+    response = await readerFFT.set_setting(setting.setting, setting.value)
     return {"message": f"{response}"}
 
 
