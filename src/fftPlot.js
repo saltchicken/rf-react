@@ -98,15 +98,42 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     isDragging = true;
   });
 
-  // Mouse move: update line if dragging
-  window.addEventListener('mousemove', function (event) {
+  // Mouse move: update line if dragging and within bounds
+  containerFFT.addEventListener('mousemove', function (event) {
     if (!isDragging) return;
+
+    const xaxis = containerFFT._fullLayout.xaxis;
+    const yaxis = containerFFT._fullLayout.yaxis;
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+
+    const bbox = containerFFT.getBoundingClientRect();
+
+    const plotLeft = bbox.left + xaxis._offset;
+    const plotRight = plotLeft + xaxis._length;
+    const plotTop = bbox.top + yaxis._offset;
+    const plotBottom = plotTop + yaxis._length;
+
+    if (
+      mouseX < plotLeft ||
+      mouseX > plotRight ||
+      mouseY < plotTop ||
+      mouseY > plotBottom
+    ) {
+      return; // Don't update if outside plot area
+    }
+
     const xData = getXDataFromMouse(event);
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
   });
 
   // Mouse up: stop dragging
-  window.addEventListener('mouseup', function () {
+  containerFFT.addEventListener('mouseup', function () {
+    isDragging = false;
+  });
+
+  // Optional: stop dragging if mouse leaves container
+  containerFFT.addEventListener('mouseleave', function () {
     isDragging = false;
   });
 
