@@ -42,6 +42,7 @@ reader_task2: asyncio.Task | None = None
 
 app = FastAPI()
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -58,6 +59,29 @@ app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
 @app.get("/")
 def serve_index():
     return FileResponse("dist/index.html")
+
+
+@app.on_event("startup")
+async def start_readerfft():
+    app.state.reader_task = asyncio.create_task(readerFFT.run())
+    app.state.reader_task2 = asyncio.create_task(readerListener.run())
+    print("ReaderFFT tasks started.")
+
+
+async def cancel_task(task, name):
+    if task:
+        print(f"Cancelling {name}...")
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            print(f"{name} cancelled cleanly.")
+
+
+@app.on_event("shutdown")
+async def shutdown_readerfft():
+    await cancel_task(app.state.reader_task, "ReaderFFT")
+    await cancel_task(app.state.reader_task2, "ReaderListener")
 
 
 class NumberPayload(BaseModel):
@@ -81,32 +105,3 @@ async def receive_x(value: XValue):
     readerListener.freq_offset = round(value.x - readerListener.center_freq)
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
-
-
-@app.on_event("startup")
-async def start_readerfft():
-    global reader_task
-    global reader_task2
-    reader_task = asyncio.create_task(readerFFT.run())
-    reader_task2 = asyncio.create_task(readerListener.run())
-    print("ReaderFFT started.")
-
-
-@app.on_event("shutdown")
-async def shutdown_readerfft():
-    global reader_task
-    global reader_task2
-    if reader_task:
-        print("Cancelling ReaderFFT...")
-        reader_task.cancel()
-        try:
-            await reader_task
-        except asyncio.CancelledError:
-            print("ReaderFFT cancelled cleanly.")
-    if reader_task2:
-        print("Cancelling ReaderFFT...")
-        reader_task2.cancel()
-        try:
-            await reader_task2
-        except asyncio.CancelledError:
-            print("ReaderFFT cancelled cleanly.")
