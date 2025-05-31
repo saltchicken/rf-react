@@ -59,7 +59,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   }];
 
   Plotly.newPlot(containerFFT, FFTData, FFTLayout, { responsive: true, staticPlot: true });
-  Plotly.newPlot(containerWaterfall, WaterfallData, WaterfallLayout, { responsive: true });
+  Plotly.newPlot(containerWaterfall, WaterfallData, WaterfallLayout, { responsive: true, staticPlot: true });
 
   let isDragging = false;
 
