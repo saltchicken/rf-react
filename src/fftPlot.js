@@ -26,7 +26,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     plot_bgcolor: '#1e1e1e',
     paper_bgcolor: '#1e1e1e',
     xaxis: { showticklabels: false, nticks: 10, color: '#ccc', gridcolor: '#222' },
-    yaxis: { title: 'Magnitude', range: [0, 100], autorange: false, color: '#ccc', gridcolor: '#222' }
+    yaxis: { title: 'Magnitude', range: [-50, 50], autorange: false, color: '#ccc', gridcolor: '#222' }
   };
 
   let WaterfallLayout = {
@@ -53,8 +53,8 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     x: freqs,
     type: 'heatmap',
     colorscale: 'Viridis',
-    zmin: 0,
-    zmax: 30,
+    zmin: -50,
+    zmax: 50,
     showscale: false,
   }];
 
