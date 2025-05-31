@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import ClickButton from './components/ClickButton';
+import GainControl from './components/GainControl';
 import { startFFTPlot } from './fftPlot';
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
         <div ref={chartRef2} style={{ height: '100%', width: '100%' }} />
       </div>
       <div style={{ margin: 0, background: '#111', color: '#ccc', height: '10%', width: '100vw' }}>
-        <ClickButton />
+        <GainControl />
       </div>
     </div>
   );

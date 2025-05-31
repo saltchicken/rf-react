@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 
-const ClickButton = () => {
+const GainControl = () => {
   const [number, setNumber] = useState('');
 
   const sendNumber = async (value) => {
@@ -58,4 +58,4 @@ const ClickButton = () => {
   );
 };
 
-export default ClickButton;
+export default GainControl;
