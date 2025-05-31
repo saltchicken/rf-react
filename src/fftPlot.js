@@ -61,9 +61,6 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   Plotly.newPlot(containerFFT, FFTData, FFTLayout, { responsive: true, staticPlot: true });
   Plotly.newPlot(containerWaterfall, WaterfallData, WaterfallLayout, { responsive: true });
 
-
-
-
   let isDragging = false;
 
   // Create vertical line shape at a given x position
@@ -123,12 +120,10 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     }
   }
 
-  // Mouse down: start dragging
   containerFFT.addEventListener('mousedown', function (event) {
     if (!isInsideGraph(event)) return;
     const xData = getXDataFromMouse(event);
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
-    // Send to FastAPI
     sendXDataToServer(xData);
     isDragging = true;
   });
@@ -141,20 +136,15 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
       return;
     }
 
-
     const xData = getXDataFromMouse(event);
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
-
-    // Send to FastAPI
     sendXDataToServer(xData);
   });
 
-  // Mouse up: stop dragging
   containerFFT.addEventListener('mouseup', function () {
     isDragging = false;
   });
 
-  // Optional: stop dragging if mouse leaves container
   containerFFT.addEventListener('mouseleave', function () {
     isDragging = false;
   });
