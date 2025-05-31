@@ -9,6 +9,7 @@ from pydantic import BaseModel
 import os
 
 
+# TODO: Get correct center_freq
 args = argparse.Namespace(
     command="fft",
     host="10.0.0.5",
