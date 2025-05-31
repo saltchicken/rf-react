@@ -90,6 +90,13 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     const xaxis = containerFFT._fullLayout.xaxis;
     return xaxis.p2l(xPixel - xaxis._offset);
   }
+  function sendXDataToServer(xData) {
+    fetch("/api/selected_x", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ x: xData })
+    }).catch(err => console.error("Failed to send xData:", err));
+  }
 
   function isInsideGraph(event) {
     const xaxis = containerFFT._fullLayout.xaxis;
@@ -122,11 +129,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     const xData = getXDataFromMouse(event);
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
     // Send to FastAPI
-    fetch("/api/selected_x", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ x: xData })
-    }).catch(err => console.error("Failed to send xData:", err));
+    sendXDataToServer(xData);
     isDragging = true;
   });
 
@@ -143,11 +146,7 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
 
     // Send to FastAPI
-    fetch("/api/selected_x", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ x: xData })
-    }).catch(err => console.error("Failed to send xData:", err));
+    sendXDataToServer(xData);
   });
 
   // Mouse up: stop dragging
