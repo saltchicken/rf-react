@@ -158,6 +158,11 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
       const json = JSON.parse(event.data);
       if (json.type === "init") {
         freqs = Array.from(new Float32Array(json.data));
+        Plotly.relayout(containerFFT, { shapes: [] });
+      }
+      if (json.type === "update") {
+        freqs = Array.from(new Float32Array(json.data));
+        Plotly.relayout(containerFFT, { shapes: [] });
       }
     } else if (event.data instanceof ArrayBuffer) {
       mags = Array.from(new Float32Array(event.data));

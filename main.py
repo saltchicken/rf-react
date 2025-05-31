@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import numpy as np
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -92,8 +93,17 @@ class SettingPayload(BaseModel):
 @app.post("/api/set-setting")
 async def button_click(setting: SettingPayload):
     response = await readerFFT.set_setting(setting.setting, setting.value)
-    await readerFFT.update_settings()
-    await readerListener.update_settings()
+    if setting.setting == "center_freq":
+        print("Setting Center Freq")
+        readerFFT.center_freq = setting.value
+        readerListener.center_freq = setting.value
+        freqs = np.fft.fftshift(
+            np.fft.fftfreq(readerFFT.fft_size, 1 / readerFFT.sample_rate)
+        ).astype(np.float32)
+        freqs += float(setting.value)
+        # TODO: Probably don't need data anymore
+        readerFFT.publisher.data = freqs.tolist()
+        readerFFT.publisher.message_queue.put_nowait(freqs.tolist())
     return {"message": f"{response}"}
 
 
@@ -104,9 +114,12 @@ class XValue(BaseModel):
 @app.post("/api/selected_x")
 async def receive_x(value: XValue):
     print(f"Received x value: {value.x}")
-    readerFFT.freq_offset = round(value.x - readerFFT.center_freq)
-    readerListener.freq_offset = round(value.x - readerListener.center_freq)
+    offset = round(value.x - readerFFT.center_freq)
+    readerFFT.freq_offset = offset
+    readerListener.freq_offset = offset
     # print(readerFFT.freq_offset, readerListener.freq_offset)
-    # print(f"Freq Center: {readerFFT.center_freq}, {readerListener.center_freq}")
+    print(
+        f"Freq Center: {readerFFT.center_freq}, {readerListener.center_freq}    Offset: {readerFFT.freq_offset}, {readerListener.freq_offset}"
+    )
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
