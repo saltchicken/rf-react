@@ -1,45 +1,10 @@
-import argparse
 import asyncio
-import numpy as np
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from rfanalyze import ReaderFFT, ReaderListener
 from pydantic import BaseModel
-import os
-
-
-# TODO: Get correct center_freq
-args = argparse.Namespace(
-    command="fft",
-    host="10.0.0.5",
-    port=5000,
-    sample_rate=2000000.0,
-    center_freq=1000000.0,
-    freq_offset=-550000.0,
-    chunk_size=4096,
-    chunks_per_frame=16,
-    decimation_factor=64,
-    publisher_port=8767,
-)
-readerFFT = ReaderFFT(args)
-reader_task: asyncio.Task | None = None
-
-args = argparse.Namespace(
-    command="fft",
-    host="10.0.0.5",
-    port=5000,
-    sample_rate=2000000.0,
-    center_freq=1000000.0,
-    freq_offset=-550000.0,
-    chunk_size=4096,
-    chunks_per_frame=16,
-    decimation_factor=64,
-    publisher_port=8767,
-)
-readerListener = ReaderListener(args)
-reader_task2: asyncio.Task | None = None
 
 app = FastAPI()
 
@@ -64,11 +29,13 @@ def serve_index():
 
 @app.on_event("startup")
 async def start_readerfft():
-    app.state.reader_task = asyncio.create_task(readerFFT.run())
-    app.state.reader_task2 = asyncio.create_task(readerListener.run())
+    app.state.readerFFT = await ReaderFFT.create("10.0.0.5", 5000)
+    app.state.readerListener = await ReaderListener.create("10.0.0.5", 5000)
+    app.state.reader_task = asyncio.create_task(app.state.readerFFT.run())
+    app.state.reader_task2 = asyncio.create_task(app.state.readerListener.run())
     # settings = await readerFFT.get_current_settings()
-    await readerFFT.update_settings()
-    await readerListener.update_settings()
+    await app.state.readerFFT.update_settings()
+    await app.state.readerListener.update_settings()
     # print(settings)
     print("ReaderFFT tasks started.")
 
@@ -96,12 +63,12 @@ class SettingPayload(BaseModel):
 
 @app.post("/api/set-setting")
 async def button_click(setting: SettingPayload):
-    response = await readerFFT.set_setting(setting.setting, setting.value)
+    response = await app.state.readerFFT.set_setting(setting.setting, setting.value)
     if setting.setting == "center_freq":
-        print("Setting Center Freq")
-        readerFFT.center_freq = setting.value
-        readerListener.center_freq = setting.value
-        await readerFFT.publisher.message_queue.put(setting.value)
+        # print("Setting Center Freq")
+        # readerFFT.center_freq = setting.value
+        # readerListener.center_freq = setting.value
+        await app.state.readerFFT.publisher.message_queue.put(setting.value)
     return {"message": f"{response}"}
 
 
@@ -112,8 +79,8 @@ class XValue(BaseModel):
 @app.post("/api/selected_x")
 async def receive_x(value: XValue):
     print(f"Received x value: {value.x}")
-    offset = round(value.x - readerFFT.center_freq)
-    readerFFT.freq_offset = offset
-    readerListener.freq_offset = offset
+    offset = round(value.x - app.state.readerFFT.center_freq)
+    app.state.readerFFT.freq_offset = offset
+    app.state.readerListener.freq_offset = offset
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
