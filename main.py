@@ -26,20 +26,20 @@ args = argparse.Namespace(
 readerFFT = ReaderFFT(args)
 reader_task: asyncio.Task | None = None
 
-# args = argparse.Namespace(
-#     command="fft",
-#     host="10.0.0.5",
-#     port=5000,
-#     sample_rate=2000000.0,
-#     center_freq=1000000.0,
-#     freq_offset=-550000.0,
-#     chunk_size=4096,
-#     chunks_per_frame=16,
-#     decimation_factor=64,
-#     publisher_port=8767,
-# )
-# readerListener = ReaderListener(args)
-# reader_task2: asyncio.Task | None = None
+args = argparse.Namespace(
+    command="fft",
+    host="10.0.0.5",
+    port=5000,
+    sample_rate=2000000.0,
+    center_freq=1000000.0,
+    freq_offset=-550000.0,
+    chunk_size=4096,
+    chunks_per_frame=16,
+    decimation_factor=64,
+    publisher_port=8767,
+)
+readerListener = ReaderListener(args)
+reader_task2: asyncio.Task | None = None
 
 app = FastAPI()
 
@@ -65,7 +65,7 @@ def serve_index():
 @app.on_event("startup")
 async def start_readerfft():
     app.state.reader_task = asyncio.create_task(readerFFT.run())
-    # app.state.reader_task2 = asyncio.create_task(readerListener.run())
+    app.state.reader_task2 = asyncio.create_task(readerListener.run())
     print("ReaderFFT tasks started.")
 
 
@@ -82,7 +82,7 @@ async def cancel_task(task, name):
 @app.on_event("shutdown")
 async def shutdown_readerfft():
     await cancel_task(app.state.reader_task, "ReaderFFT")
-    # await cancel_task(app.state.reader_task2, "ReaderListener")
+    await cancel_task(app.state.reader_task2, "ReaderListener")
 
 
 class SettingPayload(BaseModel):
@@ -116,10 +116,6 @@ async def receive_x(value: XValue):
     print(f"Received x value: {value.x}")
     offset = round(value.x - readerFFT.center_freq)
     readerFFT.freq_offset = offset
-    # readerListener.freq_offset = offset
-    # print(readerFFT.freq_offset, readerListener.freq_offset)
-    # print(
-    #     f"Freq Center: {readerFFT.center_freq}, {readerListener.center_freq}    Offset: {readerFFT.freq_offset}, {readerListener.freq_offset}"
-    # )
+    readerListener.freq_offset = offset
     # Do something with the x value (e.g. store, trigger something)
     return {"status": "ok", "x_received": value.x}
