@@ -73,20 +73,50 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   let isDragging = false;
 
   // Create vertical line shape at a given x position
-  function createVerticalLine(xData) {
-    return {
-      type: 'line',
-      x0: xData,
-      x1: xData,
-      y0: 0,
-      y1: 1,
-      yref: 'paper',
-      line: {
-        color: 'red',
-        width: 2,
-        dash: 'line'
+  // function createVerticalLine(xData) {
+  //   return {
+  //     type: 'line',
+  //     x0: xData,
+  //     x1: xData,
+  //     y0: 0,
+  //     y1: 1,
+  //     yref: 'paper',
+  //     line: {
+  //       color: 'red',
+  //       width: 2,
+  //       dash: 'line'
+  //     }
+  //   };
+  // }
+  function createVerticalLineWithBox(xData) {
+    const xMax = Math.max(...freqs); // Right edge of the plot
+
+    return [
+      {
+        // Vertical red line
+        type: 'line',
+        x0: xData,
+        x1: xData,
+        y0: 0,
+        y1: 1,
+        yref: 'paper',
+        line: {
+          color: 'red',
+          width: 2,
+          dash: 'line'
+        }
+      },
+      {
+        // Transparent rectangle to the right of the vertical line
+        type: 'rect',
+        x0: xData - 100000,
+        x1: xData + 100000,
+        y0: -50,
+        y1: 50,
+        fillcolor: 'rgba(75, 75, 75, 0.2)', // Semi-transparent red
+        line: { width: 0 }
       }
-    };
+    ];
   }
 
   // Convert mouse x pixel to data coordinate
@@ -132,7 +162,8 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   containerFFT.addEventListener('mousedown', function (event) {
     if (!isInsideGraph(event)) return;
     const xData = getXDataFromMouse(event);
-    Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+    const shapes = createVerticalLineWithBox(xData);
+    Plotly.relayout(containerFFT, { shapes });
     sendXDataToServer(xData);
     isDragging = true;
   });
@@ -146,7 +177,8 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     }
 
     const xData = getXDataFromMouse(event);
-    Plotly.relayout(containerFFT, { shapes: [createVerticalLine(xData)] });
+    const shapes = createVerticalLineWithBox(xData);
+    Plotly.relayout(containerFFT, { shapes });
     sendXDataToServer(xData);
   });
 
