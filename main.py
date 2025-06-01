@@ -97,13 +97,13 @@ async def button_click(setting: SettingPayload):
         print("Setting Center Freq")
         readerFFT.center_freq = setting.value
         # readerListener.center_freq = setting.value
-        freqs = np.fft.fftshift(
-            np.fft.fftfreq(readerFFT.fft_size, 1 / readerFFT.sample_rate)
-        ).astype(np.float32)
-        freqs += float(setting.value)
+        # freqs = np.fft.fftshift(
+        #     np.fft.fftfreq(readerFFT.fft_size, 1 / readerFFT.sample_rate)
+        # ).astype(np.float32)
+        # freqs += float(setting.value)
         # TODO: Probably don't need data anymore
-        readerFFT.publisher.data = freqs.tolist()
-        readerFFT.publisher.message_queue.put_nowait(freqs.tolist())
+        # readerFFT.publisher.data = freqs.tolist()
+        await readerFFT.publisher.message_queue.put(setting.value)
     return {"message": f"{response}"}
 
 

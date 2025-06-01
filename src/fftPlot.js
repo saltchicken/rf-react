@@ -5,7 +5,10 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   const N_FREQ_BINS = 1024;     // Number of frequency bins (FFT bins)
   const MAX_TIME_SLICES = 40; // Number of time slices visible at once
 
-  let freqs = [];
+  let freqs = Array.from({ length: N_FREQ_BINS }, (_, i) => i); // Simple bin indices (0 to 1023)
+
+
+
   let mags = [];
 
   let fftData = [];
@@ -157,12 +160,14 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     if (typeof event.data === "string") {
       const json = JSON.parse(event.data);
       if (json.type === "init") {
-        freqs = Array.from(new Float32Array(json.data));
-        Plotly.relayout(containerFFT, { shapes: [] });
+        console.log(json.data);
+        // freqs = Array.from(new Float32Array(json.data));
+        // Plotly.relayout(containerFFT, { shapes: [] });
       }
       if (json.type === "update") {
-        freqs = Array.from(new Float32Array(json.data));
-        Plotly.relayout(containerFFT, { shapes: [] });
+        // freqs = Array.from(new Float32Array(json.data));
+        console.log(json.data);
+        // Plotly.relayout(containerFFT, { shapes: [] });
       }
     } else if (event.data instanceof ArrayBuffer) {
       mags = Array.from(new Float32Array(event.data));
