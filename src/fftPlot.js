@@ -34,8 +34,8 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
     title: { text: 'Real-Time FFT', font: { color: '#ccc' } },
     plot_bgcolor: '#1e1e1e',
     paper_bgcolor: '#1e1e1e',
-    xaxis: { showticklabels: false, nticks: 10, color: '#ccc', gridcolor: '#222' },
-    yaxis: { title: 'Magnitude', range: [-50, 50], autorange: false, color: '#ccc', gridcolor: '#222' }
+    xaxis: { zeroline: false, showticklabels: false, nticks: 10, color: '#ccc', gridcolor: '#222' },
+    yaxis: { zeroline: false, title: 'Magnitude', range: [-50, 50], autorange: false, color: '#ccc', gridcolor: '#222' }
   };
 
   let WaterfallLayout = {
