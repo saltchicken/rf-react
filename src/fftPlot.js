@@ -5,7 +5,13 @@ export function startFFTPlot(containerFFT, containerWaterfall, websocketUrl = "w
   const N_FREQ_BINS = 1024;     // Number of frequency bins (FFT bins)
   const MAX_TIME_SLICES = 40; // Number of time slices visible at once
 
-  let freqs = Array.from({ length: N_FREQ_BINS }, (_, i) => i); // Simple bin indices (0 to 1023)
+  const sample_rate = 2000000;
+  const center_freq = sample_rate / 2;
+  const bin_width = sample_rate / N_FREQ_BINS;
+
+  let freqs = Array.from({ length: N_FREQ_BINS }, (_, i) =>
+    (center_freq - sample_rate / 2 + i * bin_width) - sample_rate / 2
+  );
 
 
 
