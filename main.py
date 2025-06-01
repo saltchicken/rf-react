@@ -66,6 +66,10 @@ def serve_index():
 async def start_readerfft():
     app.state.reader_task = asyncio.create_task(readerFFT.run())
     app.state.reader_task2 = asyncio.create_task(readerListener.run())
+    # settings = await readerFFT.get_current_settings()
+    await readerFFT.update_settings()
+    await readerListener.update_settings()
+    # print(settings)
     print("ReaderFFT tasks started.")
 
 
